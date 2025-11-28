@@ -152,8 +152,11 @@
   const applyZoom=()=>{
     const z=clamp(state.zoom,60,140);
     state.zoom=z;
-    $("#zoomWrap").style.transform=`scale(${z/100})`;
-    $("#zoomSlider").value=z; $("#zoomLabel").textContent=z+"%";
+    const wrap = $("#zoomWrap");
+    wrap.style.transform = `scale(${z/100})`;
+    wrap.style.transformOrigin = window.innerWidth <= 420 ? "top center" : "top left";
+    $("#zoomSlider").value=z; 
+    $("#zoomLabel").textContent=z+"%";
   };
 
   const renderRound=()=>{
