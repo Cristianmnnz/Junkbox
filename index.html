@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>JunkBox by Cris</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7aa2ff">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="skin-classic">
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>JunkBox by Cris</h1>
+        <div class="sub">Hub de apps personales</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="homeMain">
+    <section class="card homeCard">
+      <h2>Menú</h2>
+      <div class="homeButtons">
+        <!-- Botón 1: tu app futura -->
+        <a class="homeBtn ghost" href="pokeapicris.html" id="btnApp1">Pokedex</a>
+        <!-- Botón 2: Beyblade -->
+        <a class="homeBtn" href="beyblade.html">🌀 Beyblade Scoreboard</a>
+        <!-- Botón 3 y 4 -->
+        <button class="homeBtn secondary" disabled>🚧 Próximamente</button>
+        <button class="homeBtn secondary" disabled>🚧 Próximamente</button>
+      </div>
+      <p class="homeNote">Cambia el href de “App 1” cuando la subas.</p>
+    </section>
+  </main>
+
+  <footer>JunkBox by Cris • PWA</footer>
+
+  <script>
+    // Registrar service worker
+    if("serviceWorker" in navigator){ navigator.serviceWorker.register("./sw.js"); }
+  </script>
+</body>
+</html>

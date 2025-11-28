@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Beyblade Scoreboard • JunkBox by Cris</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#7aa2ff">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+
+  <link rel="stylesheet" href="styles.css">
+  <!-- html2canvas para exportar PNG -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body class="skin-classic">
+  <header>
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <h1>Beyblade Scoreboard Mega Ultra</h1>
+        <div class="sub">Double Elim estable • Seeds drag • PNG • PWA</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a href="index.html"><button class="ghost small">⬅ Menú</button></a>
+      <button class="ghost small" id="toggleTheme">🌙/☀️</button>
+      <button class="secondary small" id="exportBtn">Exportar</button>
+      <button class="secondary small" id="importBtn">Importar</button>
+      <button class="small gold" id="shareBtn">Compartir</button>
+      <button class="small bad" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <div class="tabpanes">
+    <div class="tabs card" style="margin:14px;">
+      <button class="tab active" data-tab="score">🌀 Score</button>
+      <button class="tab" data-tab="tourney">🏆 Torneo</button>
+      <button class="tab" data-tab="stats">📊 Stats</button>
+      <button class="tab" data-tab="settings">⚙️ Reglas/Skins/QR</button>
+    </div>
+
+    <div class="pane active" id="pane-score">
+      <main>
+        <section class="card">
+          <h2>Jugadores</h2>
+
+          <div class="arena">
+            <div id="topSpin" class="topSpin"></div>
+            <div id="arenaText" class="arenaText">¡Listos para la batalla!</div>
+          </div>
+
+          <div class="timerBox">
+            <div>
+              <div class="mutedTiny">Timer de ronda</div>
+              <div id="timerValue" class="timerValue">00:00</div>
+            </div>
+            <div class="timerBtns">
+              <button class="small good" id="timerStart">Start</button>
+              <button class="small" id="timerPause">Pause</button>
+              <button class="small bad" id="timerReset">Reset</button>
+            </div>
+          </div>
+
+          <div class="row" style="margin-bottom:8px;">
+            <input id="nameInput" type="text" placeholder="Nombre del jugador" maxlength="18">
+            <input id="startInput" type="number" value="0" min="0" max="999">
+            <input id="colorInput" type="color" value="#7aa2ff">
+            <button id="addPlayerBtn">Añadir</button>
+          </div>
+
+          <div class="row" style="margin-bottom:10px;">
+            <span class="chip">Ronda: <b id="roundLabel">1</b></span>
+            <span class="chip">Modo: <b id="modeLabel">First to 3</b></span>
+            <span class="chip">Objetivo: <b id="goalLabel">3 victorias</b></span>
+          </div>
+
+          <div id="playersWrap" class="players"></div>
+        </section>
+
+        <aside class="card">
+          <h2>Historial</h2>
+          <div id="historyWrap" class="history"></div>
+          <div class="row" style="margin-top:10px;">
+            <button class="secondary" id="newRoundBtn" style="flex:1;">Nueva ronda</button>
+            <button class="ghost" id="undoBtn" style="flex:1;">Deshacer</button>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="pane" id="pane-tourney">
+      <section class="card" style="margin:14px;">
+        <h2>Double Elimination (estable)</h2>
+
+        <div class="row" style="margin-bottom:8px;">
+          <div style="flex:1;min-width:220px;">
+            <label>Nombre del torneo</label><br>
+            <input id="tourneyNameInput" type="text" maxlength="40">
+          </div>
+          <div>
+            <label>Jugadores bracket</label><br>
+            <select id="maxPlayersSelect">
+              <option value="8">8</option>
+              <option value="16">16</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Tipo de torneo</label><br>
+            <select id="bracketTypeSelect">
+              <option value="double">Double Elimination</option>
+              <option value="single">Single Elimination</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card seedCard">
+          <h2>Seeds</h2>
+          <div class="row" style="margin-bottom:6px;">
+            <button class="secondary" id="randomSeedsBtn">Randomizar</button>
+            <button class="ghost" id="resetSeedsBtn">Reset</button>
+          </div>
+          <div id="seedWrap" class="seedList"></div>
+        </div>
+
+        <div class="row" style="margin-bottom:8px;">
+          <button id="genDoubleBtn">Generar torneo doble</button>
+          <button class="ghost" id="resetDoubleBtn">Reset torneo</button>
+          <button class="secondary" id="exportBracketBtn">Exportar PNG</button>
+        </div>
+
+        <div class="row" style="margin-bottom:8px;">
+          <label style="min-width:110px;">Zoom</label>
+          <button class="small" id="zoomOutBtn">−</button>
+          <input id="zoomSlider" type="range" min="60" max="140" value="100" style="flex:1;">
+          <button class="small" id="zoomInBtn">+</button>
+          <span class="chip"><b id="zoomLabel">100%</b></span>
+        </div>
+
+        <div id="bracketRoot">
+          <div class="bracketHeader">
+            <div class="title" id="bracketTitle">Torneo</div>
+            <div class="date" id="bracketDate"></div>
+          </div>
+
+          <div class="bracketScroller">
+            <div id="zoomWrap" class="bracketZoomWrap">
+              <div id="bracketBoardW" class="bracketBoard"></div>
+              <div style="height:10px"></div>
+              <div id="bracketBoardL" class="bracketBoard"></div>
+              <div style="height:10px"></div>
+              <div id="bracketBoardG" class="bracketBoard grandBoard"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="exportHint" class="exportHint"></div>
+      </section>
+    </div>
+
+    <div class="pane" id="pane-stats">
+      <section class="card" style="margin:14px;">
+        <h2>Estadísticas</h2>
+        <div id="statsWrap" class="statsGrid"></div>
+      </section>
+    </div>
+
+    <div class="pane" id="pane-settings">
+      <section class="card" style="margin:14px;">
+        <h2>Reglas</h2>
+        <div class="row">
+          <div style="min-width:220px;">
+            <label>Modo</label><br>
+            <select id="modeSelect">
+              <option value="firstTo">First to N</option>
+              <option value="bestOf">Best of M</option>
+            </select>
+          </div>
+          <div>
+            <label>N</label><br>
+            <input id="firstToN" type="number" min="1" max="20" value="3">
+          </div>
+          <div>
+            <label>M</label><br>
+            <input id="bestOfM" type="number" min="1" max="99" value="5">
+          </div>
+        </div>
+
+        <hr class="sep">
+
+        <div class="row">
+          <div><label>Spin</label><br><input id="pointsSpin" type="number" min="0" max="10" value="1"></div>
+          <div><label>Over</label><br><input id="pointsOver" type="number" min="0" max="10" value="2"></div>
+          <div><label>Burst</label><br><input id="pointsBurst" type="number" min="0" max="10" value="3"></div>
+          <div><label>Ring-Out</label><br><input id="pointsRO" type="number" min="0" max="10" value="2"></div>
+          <div><label>KO</label><br><input id="pointsKO" type="number" min="0" max="10" value="2"></div>
+        </div>
+
+        <hr class="sep">
+
+        <div class="row">
+          <div>
+            <label>Timer</label><br>
+            <select id="timerMode">
+              <option value="up">Count-up</option>
+              <option value="down">Countdown</option>
+            </select>
+          </div>
+          <div>
+            <label>Countdown (seg)</label><br>
+            <input id="timerCountdown" type="number" min="5" max="1800" value="180">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:8px;">
+          <label style="min-width:160px;">Sonidos</label>
+          <select id="soundSelect"><option value="on">On</option><option value="off">Off</option></select>
+          <label style="min-width:160px;">Auto reset</label>
+          <select id="autoResetSelect"><option value="off">No</option><option value="on">Sí</option></select>
+        </div>
+
+        <div class="row" style="margin-top:12px;">
+          <button id="applyRulesBtn" class="good">Aplicar</button>
+          <button id="defaultRulesBtn" class="ghost">Default</button>
+        </div>
+      </section>
+
+      <section class="card" style="margin:14px;">
+        <h2>Skins</h2>
+        <div class="row">
+          <div>
+            <label>Skin</label><br>
+            <select id="skinSelect">
+              <option value="classic">Classic</option>
+              <option value="fire">Fire</option>
+              <option value="ice">Ice</option>
+              <option value="neon">Neon</option>
+              <option value="void">Void</option>
+            </select>
+          </div>
+          <button id="applySkinBtn" class="secondary">Aplicar skin</button>
+        </div>
+      </section>
+
+      <section class="card" style="margin:14px;">
+        <h2>Compartir</h2>
+        <textarea id="shareCodeArea"></textarea>
+        <div class="row" style="margin-top:8px;">
+          <button id="makeCodeBtn">Generar código</button>
+          <button class="secondary" id="loadCodeBtn">Cargar código</button>
+        </div>
+        <div style="margin-top:10px;">
+          <label>QR</label>
+          <img id="qrImg" class="qrImg" alt="QR">
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="tabs-mobile">
+    <div class="bar">
+      <button class="tab active" data-tab="score">🌀 Score</button>
+      <button class="tab" data-tab="tourney">🏆 Torneo</button>
+      <button class="tab" data-tab="stats">📊 Stats</button>
+      <button class="tab" data-tab="settings">⚙️ Reglas</button>
+    </div>
+  </div>
+
+  <footer>Arrastra un jugador en el match para marcar ganador.</footer>
+
+  <script src="app.js"></script>
+  <script>if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js");}</script>
+</body>
+</html>
