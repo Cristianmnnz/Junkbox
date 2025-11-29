@@ -61,7 +61,15 @@ header{
   background: linear-gradient(180deg, rgba(0,0,0,.35), transparent);
 }
 .brand{display:flex;align-items:center;gap:12px;}
-.logo{width:40px;height:40px;border-radius:50%;background:conic-gradient(from 30deg,#7aa2ff,#57e389,#ffd166,#ff6b6b,#7aa2ff);box-shadow:0 0 0 3px rgba(255,255,255,.08),var(--shadow);}
+.logo{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  object-fit: cover; /* recorta sin deformar */
+  box-shadow:0 0 0 5px rgba(255,255,255,.08), var(--shadow);
+}
+
+
 h1{font-size:18px;margin:0;}
 .sub{color:var(--muted);font-size:12px;}
 .mutedTiny{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase;}
@@ -233,8 +241,8 @@ label{font-size:12px;color:var(--muted);font-weight:900;text-transform:uppercase
   }
   .brand{ gap: 8px; }
   .logo{ width: 34px; height: 34px; }
-  h1{ font-size: 16px; }
-  .sub{ font-size: 11px; }
+  h1{ font-size: 22px; }
+  .sub{ font-size: 8px; }
 
   /* Tabs: ocultamos las grandes y usamos barra inferior */
   .tabs.card{ display:none; }
